@@ -31,17 +31,17 @@ telemetry:
 #    exporter: jaeger-udp-thrift
 #    addr: jaeger:6831
 scanners:
-#  'ScanAntiword':
-#    - positive:
-#        flavors:
-#          - 'application/msword'
-#          - 'olecf_file'
-#      priority: 5
-#  'ScanBase64':
-#    - positive:
-#        flavors:
-#          - 'base64'
-#      priority: 5
+  'ScanAntiword':
+    - positive:
+        flavors:
+          - 'application/msword'
+          - 'olecf_file'
+      priority: 5
+  'ScanBase64':
+    - positive:
+        flavors:
+          - 'base64'
+      priority: 5
   'ScanBase64PE':
     - positive:
         flavors:
@@ -68,11 +68,31 @@ scanners:
           - 'application/x-bzip2'
           - 'bzip2_file'
       priority: 5
-#  'ScanCcn':
-#    - positive:
-#        flavors:
-#          - 'credit_cards'
-#      priority: 5
+  'ScanCapa':
+    - positive:
+        flavors:
+          - 'application/x-dosexec'
+          - 'mz_file'
+          - 'application/x-mach-binary'
+          - 'macho_file'
+          - 'application/x-object'
+          - 'application/x-executable'
+          - 'application/x-sharedlib'
+          - 'application/x-coredump'
+      priority: 5
+      options:
+        tmp_directory: '/dev/shm/'
+        rules: '/opt/capa-rules/'
+        signatures: '/opt/capa-sigs/'
+        size_limit: 5000000
+        timeout: 300
+        scanner_timeout: 330
+        limit: 200
+  'ScanCcn':
+    - positive:
+        flavors:
+          - 'credit_cards'
+      priority: 5
   'ScanDmg':
     - positive:
         flavors:
@@ -87,15 +107,15 @@ scanners:
       priority: 5
       options:
         extract_text: False
-#  'ScanElf':
-#    - positive:
-#        flavors:
-#          - 'application/x-object'
-#          - 'application/x-executable'
-#          - 'application/x-sharedlib'
-#          - 'application/x-coredump'
-#          - 'elf_file'
-#      priority: 5
+  'ScanElf':
+    - positive:
+        flavors:
+          - 'application/x-object'
+          - 'application/x-executable'
+          - 'application/x-sharedlib'
+          - 'application/x-coredump'
+          - 'elf_file'
+      priority: 5
   'ScanEmail':
     - positive:
         flavors:
@@ -278,13 +298,13 @@ scanners:
       options:
         parser: "html5lib"
         max_hyperlinks: 50
-#  'ScanIni':
-#    - positive:
-#        filename: '(\.([Cc][Ff][Gg]|[Ii][Nn][Ii])|PROJECT)$'
-#        flavors:
-#          - 'ini_file'
-#          - 'olecf_file'
-#      priority: 5
+  'ScanIni':
+    - positive:
+        filename: '(\.([Cc][Ff][Gg]|[Ii][Nn][Ii])|PROJECT)$'
+        flavors:
+          - 'ini_file'
+          - 'olecf_file'
+      priority: 5
   'ScanIso':
     - positive:
         flavors:
@@ -555,6 +575,39 @@ scanners:
       priority: 5
       options:
         limit: 1000
+  'ScanRetdec':
+    - positive:
+        flavors:
+          - 'application/x-dosexec'
+          - 'mz_file'
+          - 'application/x-mach-binary'
+          - 'macho_file'
+          - 'application/x-object'
+          - 'application/x-executable'
+          - 'application/x-sharedlib'
+          - 'application/x-coredump'
+      priority: 5
+      options:
+        tmp_directory: '/dev/shm/'
+        size_limit: 5000000
+        timeout: 240
+        scanner_timeout: 300
+        limit: 200
+  'ScanRetdecFileinfo':
+    - positive:
+        flavors:
+          - 'application/x-dosexec'
+          - 'mz_file'
+          - 'application/x-mach-binary'
+          - 'macho_file'
+          - 'application/x-object'
+          - 'application/x-executable'
+          - 'application/x-sharedlib'
+          - 'application/x-coredump'
+      priority: 5
+      options:
+        tmp_directory: '/dev/shm/'
+        limit: 100
   'ScanRpm':
     - positive:
         flavors:
@@ -571,14 +624,14 @@ scanners:
       priority: 5
       options:
         limit: 1000
-#  'ScanSave':
-#    - positive:
-#        flavors:
-#          - '*'
-#      priority: 5
-#      options:
-#        compression: 'gzip'
-#        encoding: 'base64'
+  'ScanSave':
+    - positive:
+        flavors:
+          - '*'
+      priority: 5
+      options:
+        compression: 'gzip'
+        encoding: 'base64'
   'ScanSevenZip':
     - positive:
         flavors:
@@ -595,14 +648,14 @@ scanners:
         crack_pws: True
         log_pws: True
 #        brute_force: True
-#  'ScanStrings':
-#    - positive:
-#        flavors:
-#          - 'mz_file'
-#    - negative:
-#        flavors:
-#          - 'base64'
-#      priority: 5
+  'ScanStrings':
+    - positive:
+        flavors:
+          - 'mz_file'
+      negative:
+        flavors:
+          - 'base64'
+      priority: 5
   'ScanSwf':
     - positive:
         flavors:
@@ -681,6 +734,22 @@ scanners:
       priority: 5
       options:
         analyze_macros: True
+  'ScanVipermonkey':
+    - positive:
+        flavors:
+          - 'mhtml_file'
+          - 'application/msword'
+          - 'olecf_file'
+          - 'wordml_file'
+          - 'application/vnd.ms-office'
+          - 'application/x-mspublisher'
+      priority: 5
+      options:
+        tmp_directory: '/dev/shm/'
+        size_limit: 5000000
+        timeout: 180
+        scanner_timeout: 210
+        limit: 200
   'ScanVhd':
     - positive:
         flavors:
@@ -728,7 +797,7 @@ scanners:
           - '*'
       priority: 5
       options:
-        location: '/etc/strelka/yara/'
+        location: '/etc/strelka/yara/rules.yara'
         compiled:
           enabled: False
           filename: "rules.compiled"

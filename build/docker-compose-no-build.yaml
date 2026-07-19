@@ -27,7 +27,7 @@ services:
     image: target/strelka-backend:latest
     command: strelka-backend
     pull_policy: always
-    shm_size: 512mb  # increase as necessary, required for some scanners
+    shm_size: 1gb  # increase as necessary, required for some scanners
     networks:
       - net
     volumes:
@@ -35,10 +35,10 @@ services:
     restart: unless-stopped
     depends_on:
       - coordinator
-    # deploy:
-    #   mode: replicated
-    #   replicas: 2
-    #   endpoint_mode: vip
+    deploy:
+       mode: replicated
+       replicas: 16
+       endpoint_mode: vip
 
   manager:
     image: target/strelka-manager:latest

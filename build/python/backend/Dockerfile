@@ -8,6 +8,9 @@ ARG CONFIG_TESTS=false
 
 ARG YARA_VERSION=4.5.4
 ARG EXIFTOOL_VERSION=12.60
+ARG RETDEC_VERSION=5.0
+ARG CAPA_VERSION=9.4.0
+ARG PYTHON2_VERSION=2.7.18
 
 # Environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -109,6 +112,54 @@ RUN apt-get -q update && \
     cd yara-python-$YARA_VERSION/ && \
     python3 setup.py build --dynamic-linking && \
     python3 setup.py install
+
+# Install RetDec (prebuilt release, no compiler needed)
+RUN mkdir -p /opt/retdec && \
+    cd /tmp/ && \
+    curl -OL https://github.com/avast/retdec/releases/download/v$RETDEC_VERSION/RetDec-v$RETDEC_VERSION-Linux-Release.tar.xz && \
+    tar -xf RetDec-v$RETDEC_VERSION-Linux-Release.tar.xz -C /opt/retdec && \
+    rm RetDec-v$RETDEC_VERSION-Linux-Release.tar.xz
+ENV PATH=$PATH:/opt/retdec/bin
+
+# Install capa-rules (matches the flare-capa version installed via Poetry below)
+RUN mkdir -p /opt/capa-rules && \
+    cd /tmp/ && \
+    curl -OL https://github.com/mandiant/capa-rules/archive/refs/tags/v$CAPA_VERSION.tar.gz && \
+    tar -xzf v$CAPA_VERSION.tar.gz -C /opt/capa-rules --strip-components=1 && \
+    rm v$CAPA_VERSION.tar.gz
+
+# Install capa's FLIRT signatures (from the main capa repo's sigs/ directory, not
+# bundled with the pip package -- without these, capa raises an unhandled OSError
+# on PE/ELF/Mach-O samples since it can't find its default signature path)
+RUN mkdir -p /opt/capa-sigs && \
+    cd /opt/capa-sigs && \
+    curl -OL https://raw.githubusercontent.com/mandiant/capa/v$CAPA_VERSION/sigs/1_flare_msvc_rtf_32_64.sig && \
+    curl -OL https://raw.githubusercontent.com/mandiant/capa/v$CAPA_VERSION/sigs/2_flare_msvc_atlmfc_32_64.sig && \
+    curl -OL https://raw.githubusercontent.com/mandiant/capa/v$CAPA_VERSION/sigs/3_flare_common_libs.sig
+
+# Install an isolated Python 2.7 interpreter for ViperMonkey (VBA macro
+# emulator, https://github.com/decalage2/ViperMonkey) -- ViperMonkey's own
+# code uses Python-2-only implicit relative imports and cannot run under
+# Python 3, so it needs its own interpreter, kept fully separate from
+# Strelka's Python 3/Poetry environment.
+RUN cd /tmp/ && \
+    curl -OL https://www.python.org/ftp/python/$PYTHON2_VERSION/Python-$PYTHON2_VERSION.tgz && \
+    tar -xzf Python-$PYTHON2_VERSION.tgz && \
+    cd Python-$PYTHON2_VERSION && \
+    ./configure --prefix=/opt/python2.7 && \
+    make -j"$(nproc)" && \
+    make install && \
+    cd / && \
+    rm -rf /tmp/Python-$PYTHON2_VERSION /tmp/Python-$PYTHON2_VERSION.tgz && \
+    curl -OL https://bootstrap.pypa.io/pip/2.7/get-pip.py && \
+    /opt/python2.7/bin/python2.7 get-pip.py && \
+    rm get-pip.py && \
+    # regex >= 2021 dropped Python 2 support at the C level, so ViperMonkey's
+    # unpinned "regex" dependency would otherwise try (and fail) to compile
+    # current regex source under Python 2. Pin the last version with a cp27
+    # wheel before installing ViperMonkey itself.
+    /opt/python2.7/bin/python2.7 -m pip install -q "regex==2020.10.28" && \
+    /opt/python2.7/bin/python2.7 -m pip install -q -U "https://github.com/decalage2/ViperMonkey/archive/master.zip"
 
 # Mark zeek as manual (keeps getting autoremoved?)
 RUN apt-mark manual zeek-lts

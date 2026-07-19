@@ -29,7 +29,7 @@ services:
       context: ..
       dockerfile: build/python/backend/Dockerfile
     command: strelka-backend
-    shm_size: 512mb  # increase as necessary, required for some scanners
+    shm_size: 1gb  # increase as necessary, required for some scanners
     networks:
       - net
     volumes:

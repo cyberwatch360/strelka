@@ -50,7 +50,7 @@ pgpdump3 = "1.5.2"
 py-tlsh = "5.0.0"
 pycdlib = "1.14.0"
 pycryptodomex = "3.23.0"
-pyelftools = "0.29"
+pyelftools = ">=0.31"
 pygments = "2.20.0"
 PyMuPDF = "1.26.1"
 pytesseract = "0.3.10"
@@ -83,6 +83,7 @@ donut-decryptor = { git = "https://github.com/volexity/donut-decryptor", rev = "
 entropy = { git = "https://github.com/jshlbrd/python-entropy.git", rev = "a49f1addccb88d54115832a6d1982b957a56f329" }
 zipp = "^3.20.1"
 certifi = "^2025.1.31"
+flare-capa = "9.4.0"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=25.1,<27.0"
