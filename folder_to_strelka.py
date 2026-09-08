@@ -56,36 +56,7 @@ log = logging.getLogger("folder2strelka")
 CANCELLED_STREAM_MARKER = "RST_STREAM"
 
 SKIP_EXTENSIONS = {
-    ".txt",
-    ".pass",
-    ".shasum",
-    ".sha256",
-    ".md5",
-    ".md",
-    ".csv",
-    ".tsv",
-    ".pass",
-    ".png",
-    ".xml",
-    ".properties",
-    ".arsc",
-    ".dex",
-    ".sf",
-    ".jpg",
-    ".sha1",
-    ".c",
-    ".cpp",
-    ".cs",
-    ".json",
-    ".log",
-    ".ini",
-    ".yaml",
-    ".yml",
-    ".db",
-    ".sqlite",
-    ".gitkeep",
-    ".gitignore",
-    ".DS_Store",
+    ".aaa"
 }
 SKIP_FILENAMES = {
     "readme",
@@ -386,7 +357,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--timeout",
         type=int,
-        default=120,
+        default=360,
         help="Per-file Strelka scan timeout, in seconds",
     )
     parser.add_argument(
