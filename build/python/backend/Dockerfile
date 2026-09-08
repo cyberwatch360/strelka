@@ -270,11 +270,13 @@ USER $USERNAME
 # Use --build-arg SCANNER_TEST=test_scan_<scannername>.py to ignore all but selected scanner
 # ex: docker-compose build --build-arg SCANNER_TEST=test_scan_yara.py
 ARG SCANNER_TEST=""
+ARG SCANNER_TESTS=true
+ARG PYTEST_DESELECT=""
 
 # Run tests. Fail build if any tests fail.
 RUN echo '[+] Run build checks' && \
     cd /strelka/strelka/ && \
-    if $SCANNER_TESTS; then python3 -m pytest -p no:cacheprovider -s tests/$SCANNER_TEST; fi && \
+    if $SCANNER_TESTS; then python3 -m pytest -p no:cacheprovider -s tests/$SCANNER_TEST $PYTEST_DESELECT; fi && \
     if $CONFIG_TESTS; then python3 -m pytest -s tests_configuration/; fi && \
     echo '[+] Done'
 
